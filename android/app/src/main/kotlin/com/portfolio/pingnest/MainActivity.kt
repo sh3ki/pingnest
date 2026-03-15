@@ -1,4 +1,4 @@
-package com.portfolio.pingnest
+package com.pingnest.app
 
 import io.flutter.embedding.android.FlutterActivity
 
