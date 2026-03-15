@@ -1,7 +1,9 @@
 class Contact {
   final String id;
   final String name;
-  final String avatar; // emoji
+  final String initials;
+  final String avatarUrl;
+  final bool isGroup;
   final bool isOnline;
   final String status;
   final String phone;
@@ -9,7 +11,9 @@ class Contact {
   const Contact({
     required this.id,
     required this.name,
-    required this.avatar,
+    required this.initials,
+    required this.avatarUrl,
+    this.isGroup = false,
     this.isOnline = false,
     this.status = '',
     this.phone = '',
@@ -54,15 +58,13 @@ class Conversation {
 
 class Story {
   final Contact contact;
-  final String emoji;
-  final String caption;
+  final String imageUrl;
   final DateTime timestamp;
   bool viewed;
 
   Story({
     required this.contact,
-    required this.emoji,
-    required this.caption,
+    required this.imageUrl,
     required this.timestamp,
     this.viewed = false,
   });
