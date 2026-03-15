@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../data/mock_data.dart';
+import '../data/chat_data.dart';
 import '../models/chat_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_logo.dart';
@@ -8,7 +8,6 @@ import '../widgets/app_logo.dart';
 class ChatDetailScreen extends StatefulWidget {
   final Conversation conversation;
   const ChatDetailScreen({super.key, required this.conversation});
-
   @override
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
@@ -26,17 +25,27 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   @override
-  void dispose() { _msgCtrl.dispose(); _scrollCtrl.dispose(); super.dispose(); }
+  void dispose() {
+    _msgCtrl.dispose();
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
 
   void _send() {
     final text = _msgCtrl.text.trim();
     if (text.isEmpty) return;
     setState(() {
-      _messages.add(Message(id: 'new_${DateTime.now().millisecondsSinceEpoch}', senderId: MockData.kSelfId, text: text, timestamp: DateTime.now()));
+      _messages.add(Message(
+          id: 'new_${DateTime.now().millisecondsSinceEpoch}',
+          senderId: ChatData.kSelfId,
+          text: text,
+          timestamp: DateTime.now()));
     });
     _msgCtrl.clear();
     Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollCtrl.hasClients) _scrollCtrl.animateTo(_scrollCtrl.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      if (_scrollCtrl.hasClients)
+        _scrollCtrl.animateTo(_scrollCtrl.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
     });
   }
 
@@ -44,19 +53,37 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   Widget build(BuildContext context) {
     final contact = widget.conversation.contact;
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FF),
+      backgroundColor: AppTheme.surface,
       appBar: AppBar(
         title: Row(children: [
-          AvatarWidget(emoji: contact.avatar, isOnline: contact.isOnline, size: 40),
+          AvatarWidget(
+            initials: contact.initials,
+            imageUrl: contact.avatarUrl,
+            isOnline: contact.isOnline,
+            hasStory: ChatData.hasStory(contact.id),
+            storyViewed: !ChatData.hasUnviewedStory(contact.id),
+            size: 40,
+          ),
           const SizedBox(width: 12),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(contact.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
-            Text(contact.isOnline ? 'Online' : 'Offline', style: const TextStyle(fontSize: 12, color: Colors.white70)),
+            Text(contact.name,
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white)),
+            Text(
+              contact.isGroup
+                  ? contact.status
+                  : (contact.isOnline ? 'Online' : 'Offline'),
+              style:
+                  TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.7)),
+            ),
           ]),
         ]),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.call_outlined)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.videocam_outlined)),
+          IconButton(
+              onPressed: () {}, icon: const Icon(Icons.videocam_outlined)),
         ],
       ),
       body: Column(children: [
@@ -67,13 +94,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             itemCount: _messages.length,
             itemBuilder: (_, i) {
               final msg = _messages[i];
-              final isSelf = msg.senderId == MockData.kSelfId;
+              final isSelf = msg.senderId == ChatData.kSelfId;
               return Align(
-                alignment: isSelf ? Alignment.centerRight : Alignment.centerLeft,
+                alignment:
+                    isSelf ? Alignment.centerRight : Alignment.centerLeft,
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 4),
-                  constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.72),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: isSelf ? AppTheme.sentBubble : Colors.white,
                     borderRadius: BorderRadius.only(
@@ -84,14 +114,30 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     ),
                     boxShadow: AppTheme.softShadow,
                   ),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                    Text(msg.text, style: TextStyle(color: isSelf ? Colors.white : Colors.black87, fontSize: 15)),
-                    const SizedBox(height: 4),
-                    Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(DateFormat('hh:mm a').format(msg.timestamp), style: TextStyle(fontSize: 10, color: isSelf ? Colors.white70 : Colors.grey)),
-                      if (isSelf) ...[const SizedBox(width: 4), Icon(msg.isRead ? Icons.done_all : Icons.done, size: 14, color: Colors.white70)],
-                    ]),
-                  ]),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(msg.text,
+                            style: TextStyle(
+                                color: isSelf
+                                    ? Colors.white
+                                    : AppTheme.textPrimary,
+                                fontSize: 15)),
+                        const SizedBox(height: 4),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text(DateFormat('hh:mm a').format(msg.timestamp),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: isSelf
+                                      ? Colors.white70
+                                      : AppTheme.textSecondary)),
+                          if (isSelf) ...[
+                            const SizedBox(width: 4),
+                            Icon(msg.isRead ? Icons.done_all : Icons.done,
+                                size: 14, color: Colors.white70)
+                          ],
+                        ]),
+                      ]),
                 ),
               );
             },
@@ -102,16 +148,22 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: SafeArea(
             child: Row(children: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.add_circle_outline), color: AppTheme.primary),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.add_circle_outline_rounded),
+                  color: AppTheme.secondary),
               Expanded(
                 child: TextField(
                   controller: _msgCtrl,
                   decoration: InputDecoration(
                     hintText: 'Message...',
                     filled: true,
-                    fillColor: const Color(0xFFF0F4FF),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    fillColor: AppTheme.surface,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                   ),
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _send(),
@@ -121,9 +173,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               GestureDetector(
                 onTap: _send,
                 child: Container(
-                  width: 44, height: 44,
-                  decoration: const BoxDecoration(color: AppTheme.primary, shape: BoxShape.circle),
-                  child: const Icon(Icons.send, color: Colors.white, size: 20),
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                      color: AppTheme.secondary, shape: BoxShape.circle),
+                  child: const Icon(Icons.send_rounded,
+                      color: Colors.white, size: 20),
                 ),
               ),
             ]),
