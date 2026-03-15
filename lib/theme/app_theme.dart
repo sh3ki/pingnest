@@ -3,29 +3,22 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  static const Color primary = Color(0xFF3B82F6);
-  static const Color secondary = Color(0xFF10B981);
-  static const Color accent = Color(0xFFF59E0B);
-  static const Color surface = Color(0xFFF8FAFF);
-  static const Color sentBubble = Color(0xFF3B82F6);
+  // Slate Signal palette
+  static const Color primary = Color(0xFF4A5568);     // Slate
+  static const Color secondary = Color(0xFF2B9E9E);   // Teal
+  static const Color accent = Color(0xFFE8A838);       // Amber
+  static const Color surface = Color(0xFFF7F8FA);     // Light gray
+  static const Color sentBubble = Color(0xFF4A5568);
   static const Color receivedBubble = Color(0xFFFFFFFF);
-
-  static LinearGradient get heroGradient => const LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF3B82F6), Color(0xFF6366F1)],
-  );
-
-  static LinearGradient get onlineGradient => const LinearGradient(
-    colors: [Color(0xFF10B981), Color(0xFF059669)],
-  );
+  static const Color textPrimary = Color(0xFF2D3748);
+  static const Color textSecondary = Color(0xFF8C95A6);
 
   static List<BoxShadow> get cardShadow => [
-    BoxShadow(color: primary.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, 4)),
+    BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 3)),
   ];
 
   static List<BoxShadow> get softShadow => [
-    BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 2)),
+    BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
   ];
 
   static ThemeData get lightTheme {
@@ -35,8 +28,7 @@ class AppTheme {
     );
     return base.copyWith(
       scaffoldBackgroundColor: surface,
-      textTheme: base.textTheme,
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -44,8 +36,8 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
-        indicatorColor: primary.withOpacity(0.15),
-        labelTextStyle: WidgetStateProperty.all(TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+        indicatorColor: primary.withOpacity(0.12),
+        labelTextStyle: WidgetStateProperty.all(const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
       ),
     );
   }
